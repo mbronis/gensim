@@ -1,11 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 import pandas as pd
 
 from src.transformers import PassThroughMixin
 
 
-class DataLoader(ABC):
+class DataLoader(PassThroughMixin):
     """Base class for data loaders with interface for Pipeline usage"""
 
     def __init__(self, file_name: str) -> None:
@@ -15,14 +15,8 @@ class DataLoader(ABC):
     def load(self) -> pd.DataFrame:
         pass
 
-    def fit(self, X: pd.DataFrame, y: pd.Series = None):
-        return self
-
     def transform(self, X: pd.DataFrame, y: pd.Series = None) -> pd.DataFrame:
         return self.load()
-
-    def fit_transform(self, X: pd.DataFrame, y: pd.Series = None) -> pd.DataFrame:
-        return self.transform(X, y)
 
 
 class CsvDataLoader(DataLoader):
