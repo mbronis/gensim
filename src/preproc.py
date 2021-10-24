@@ -23,11 +23,13 @@ class RawDataCleaner(PassThroughMixin):
 
 
 class TextCleaner(PassThroughMixin):
-    """Cleans texts of polish language and filters failed datum"""
+    """Cleans texts of polish language and filters out texts with low len after cleaning"""
 
-    def __init__(self, keep_digits: int = 1, keep_punct: int = 0) -> None:
+    def __init__(self, keep_digits: int = 1, keep_punct: int = 0, min_token_len: int = 2) -> None:
         self.keep_digits = keep_digits
         self.keep_punct = keep_punct
+        self.min_token_len = min_token_len
+
 
     @staticmethod
     def clean_text(s: str, keep_digits: int = 1, keep_punct: int = 0) -> str:
@@ -44,8 +46,8 @@ class TextCleaner(PassThroughMixin):
         pattern = pattern_fact[pattern_flag]
         
         s = re.sub(special, ' ', s)
-        s = re.sub(r'\s+', ' ', s)
         s = re.sub(pattern, '', s)
+        s = re.sub(r'\s+', ' ', s)
         s = s.strip()
         
         return s
@@ -57,7 +59,7 @@ class TextCleaner(PassThroughMixin):
         X_clean['desc_clean'] = X_clean['desc'].apply(cleaner)
         X_clean['len_clean'] = X_clean['desc_clean'].apply(len)
         X_clean['len_clean_ratio'] = X_clean['len_clean'] / X_clean['len']
-        X_clean = X_clean[X_clean['len_clean'] > 1]
+        X_clean = X_clean[X_clean['len_clean'] >= self.min_token_len]
         X_clean = X_clean.reset_index(drop=True)
 
         return X_clean
