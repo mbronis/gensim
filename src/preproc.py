@@ -58,5 +58,6 @@ class TextCleaner(PassThroughMixin):
         X_clean['len_clean'] = X_clean['desc_clean'].apply(len)
         X_clean['len_clean_ratio'] = X_clean['len_clean'] / X_clean['len']
         X_clean = X_clean[X_clean['len_clean'] > 1]
+        X_clean = X_clean.reset_index(drop=True)
 
         return X_clean
