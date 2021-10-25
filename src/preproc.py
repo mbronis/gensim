@@ -1,4 +1,6 @@
+from abc import abstractmethod
 import re
+from typing import List
 
 import pandas as pd
 
@@ -23,11 +25,25 @@ class RawDataCleaner(PassThroughMixin):
 
 
 class TextCleaner(PassThroughMixin):
-    """Cleans texts of polish language and filters out texts with low len after cleaning"""
+    """Cleans texts of polish language and filters out texts with low len after cleaning
 
-    def __init__(self, keep_digits: bool = True, keep_punct: bool = False, min_token_len: int = 2) -> None:
+
+    Parameters
+    ----------
+        keep_digits : bool = True
+            flag indicating if digits should be kept
+        keep_punct : bool = False
+            flag indicating if punctuation characters should be kept
+        lower : bool = True
+            convert text to lower-case after cleaning
+        min_token_len : int = 2
+            datum with sentence lenght after cleaning lower than `min_token_len` will be removed
+    """
+
+    def __init__(self, keep_digits: bool = True, keep_punct: bool = False, lower: bool = False, min_token_len: int = 2) -> None:
         self.keep_digits = keep_digits
         self.keep_punct = keep_punct
+        self.lower = lower
         self.min_token_len = min_token_len
 
     @staticmethod
@@ -78,6 +94,9 @@ class TextCleaner(PassThroughMixin):
 
         X_clean['desc_clean'] = X_clean['desc'].apply(TextCleaner._base_clean, self.keep_digits, self.keep_punct)
         X_clean['desc_clean'] = X_clean['desc_clean'].apply(TextCleaner._collapse_exploded)
+        if self.lower:
+            X_clean['desc_clean'] = X_clean['desc_clean'].str.lower()
+
         X_clean['len_clean'] = X_clean['desc_clean'].apply(len)
         X_clean['len_clean_ratio'] = X_clean['len_clean'] / X_clean['len']
 
@@ -85,3 +104,28 @@ class TextCleaner(PassThroughMixin):
         X_clean = X_clean.reset_index(drop=True)
 
         return X_clean
+
+
+class BaseTokenizer(PassThroughMixin):
+    """Base class for sentence tokenization"""
+
+    @staticmethod
+    @abstractmethod
+    def tokenize(doc: str) -> List[str]:
+        pass
+
+    @classmethod
+    def transform(cls, X: pd.DataFrame, y: pd.Series = None) -> pd.DataFrame:
+        X_copy = X.copy()
+
+        X_copy['tokens'] = X_copy['desc_clean'].apply(cls.tokenize)
+        X_copy['tokens_len'] = X_copy['tokens'].apply(len)
+
+        return X_copy
+
+
+class SimpleTokenizer(BaseTokenizer):
+    """Splits words by space"""
+
+    def tokenize(doc: str) -> List[str]:
+        return [tok for tok in doc.split()]
