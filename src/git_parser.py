@@ -15,7 +15,7 @@ class GitParser:
         self.commit_message = self._master.commit.message
         self.commit_sha = self._master.commit.hexsha
 
-    def get_details(self):
+    def get_info(self):
         GitDetails = namedtuple("git_details", "dir branch message sha")
         return GitDetails(self.working_dir, self.branch_name, self.commit_message, self.commit_sha)
 

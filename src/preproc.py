@@ -40,7 +40,7 @@ class TextCleaner(PassThroughMixin):
             datum with sentence lenght after cleaning lower than `min_token_len` will be removed
     """
 
-    def __init__(self, keep_digits: bool = True, keep_punct: bool = False, lower: bool = True, min_token_len: int = 2) -> None:
+    def __init__(self, keep_digits: bool = True, keep_punct: bool = False, lower: bool = True, min_token_len: int = 2):
         self.keep_digits = keep_digits
         self.keep_punct = keep_punct
         self.lower = lower

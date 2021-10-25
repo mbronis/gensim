@@ -1,5 +1,7 @@
 venv*
+data/*/
 data/*.csv
+data/*.pkl
 python_path.txt
 test.py
 .ipynb_checkpoints
