@@ -4,3 +4,4 @@ gensim==4.1.2
 notebook
 jupyter_contrib_nbextensions
 matplotlib==3.4.3
+gitpython
