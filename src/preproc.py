@@ -61,7 +61,7 @@ class TextCleaner(PassThroughMixin):
         pattern = pattern_fact[pattern_flag]
 
         s = re.sub(special, ' ', s)
-        s = re.sub(pattern, '', s)
+        s = re.sub(pattern, ' ', s)
         s = re.sub(r'\s+', ' ', s)
         s = s.strip()
 
