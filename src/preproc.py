@@ -40,7 +40,7 @@ class TextCleaner(PassThroughMixin):
             datum with sentence lenght after cleaning lower than `min_token_len` will be removed
     """
 
-    def __init__(self, keep_digits: bool = True, keep_punct: bool = False, lower: bool = False, min_token_len: int = 2) -> None:
+    def __init__(self, keep_digits: bool = True, keep_punct: bool = False, lower: bool = True, min_token_len: int = 2) -> None:
         self.keep_digits = keep_digits
         self.keep_punct = keep_punct
         self.lower = lower
@@ -67,33 +67,10 @@ class TextCleaner(PassThroughMixin):
 
         return s
 
-    @staticmethod
-    def _collapse_exploded(str, separators: str = ' .-_') -> str:
-        """Collapse word expanded with ``separators``.
-
-        Example
-        --------
-        >>> _collapse_exploded('jesteś b r z y d k i')
-        'jesteś brzydki'
-        """
-        if len(str) < 5:
-            return str
-
-        remove = []
-        for i, l in enumerate(str[2:-1]):
-            if l in separators:
-                if (str[i - 2] in separators) & (str[i + 2] in separators):
-                    if (str[i - 1].isalpha()) & (str[i + 1].isalpha()):
-                        remove.append(i)
-                        remove.append(i + 2)
-
-        return ''.join([l for i, l in enumerate(str) if i not in remove])
-
     def transform(self, X: pd.DataFrame, y: pd.Series = None) -> pd.DataFrame:
         X_clean = X.copy()
 
         X_clean['desc_clean'] = X_clean['desc'].apply(TextCleaner._base_clean, self.keep_digits, self.keep_punct)
-        X_clean['desc_clean'] = X_clean['desc_clean'].apply(TextCleaner._collapse_exploded)
         if self.lower:
             X_clean['desc_clean'] = X_clean['desc_clean'].str.lower()
 
