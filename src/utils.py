@@ -1,3 +1,6 @@
+"""Module with various utility functions and classes"""
+
+
 import logging
 from typing import Dict
 

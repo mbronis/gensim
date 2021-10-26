@@ -1,3 +1,6 @@
+"""Module with custom exceptions"""
+
+
 class GitIsDirtyException(Exception):
     """Exception raised when there are uncommited changes in current repo"""
 

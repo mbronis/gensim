@@ -1,3 +1,10 @@
+"""A script for running preprocessing on raw data
+
+Main steps are defined as Pipeline allowing for easy parametrization
+Preprocessed data is pickled for later usage in models.
+"""
+
+
 from datetime import datetime
 
 from src.git_parser import GitParser

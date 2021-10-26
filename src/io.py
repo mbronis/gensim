@@ -1,3 +1,6 @@
+"""Module with classes for loading and saving data/metadata/models"""
+
+
 import os
 import pickle
 from abc import abstractmethod

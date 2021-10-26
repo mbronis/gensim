@@ -1,3 +1,6 @@
+"""Module with classes for raw data preprocessing"""
+
+
 from abc import abstractmethod
 import re
 from typing import List

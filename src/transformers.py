@@ -1,3 +1,6 @@
+"""Module helper classes allowing for adaptation for pipeline usage"""
+
+
 from abc import ABC, abstractmethod
 
 import pandas as pd
