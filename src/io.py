@@ -10,6 +10,10 @@ import pandas as pd
 
 from src.transformers import PassThroughMixin
 from src.exceptions import BadPickleLoaderDataType
+from src.utils import Logger
+
+
+logger = Logger('io')
 
 
 class DataLoader(PassThroughMixin):
@@ -34,7 +38,12 @@ class CsvDataLoader(DataLoader):
         self.file_name = file_name
 
     def load(self) -> pd.DataFrame:
-        return pd.read_csv(self.folder + self.file_name)
+        path = os.path.join(self.folder, self.file_name)
+
+        logger.log(f'loading from csv: {path}')
+        data = pd.read_csv(path)
+        logger.log(f'loaded {len(data)} rows')
+        return data
 
 
 class PickleLoader(DataLoader):
@@ -54,7 +63,11 @@ class PickleLoader(DataLoader):
     def load(self) -> pd.DataFrame:
         file_name = PickleLoader.file_name[self.data_type]
         path = os.path.join(PickleLoader.folder, self.save_dir, file_name)
-        return pd.read_pickle(path)
+
+        logger.log(f'loading from pickle: {path}')
+        data = pd.read_pickle(path)
+        logger.log(f'loaded {len(data)} rows')
+        return data
 
     @staticmethod
     def list_dir() -> List[str]:
@@ -65,7 +78,7 @@ class PickleLoader(DataLoader):
     @staticmethod
     def get_latest_dir() -> List[str]:
         """Returns the latest save directory"""
-        return PickleLoader.list_dir()[-1]
+        return sorted(PickleLoader.list_dir())[-1]
 
 class DataSaver(PassThroughMixin):
     """Base class for data saver with interface for Pipeline usage"""
