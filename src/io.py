@@ -1,10 +1,12 @@
 import os
 import pickle
 from abc import abstractmethod
+from typing import List
 
 import pandas as pd
 
 from src.transformers import PassThroughMixin
+from src.exceptions import BadPickleLoaderDataType
 
 
 class DataLoader(PassThroughMixin):
@@ -31,6 +33,37 @@ class CsvDataLoader(DataLoader):
     def load(self) -> pd.DataFrame:
         return pd.read_csv(self.folder + self.file_name)
 
+
+class PickleLoader(DataLoader):
+    """Loading preprocessed data from pickle"""
+    file_name = {
+        'data': 'df_prepro.pkl',
+        'meta': 'df_prepro_meta.pkl'
+    }
+    folder = './data/'
+
+    def __init__(self, save_dir: str = None, data_type: str = 'data'):
+        self.save_dir = save_dir or PickleLoader.get_latest_dir()
+        if data_type not in PickleLoader.file_name:
+            raise BadPickleLoaderDataType(data_type)
+        self.data_type = data_type
+
+    def load(self) -> pd.DataFrame:
+        file_name = PickleLoader.file_name[self.data_type]
+        path = os.path.join(PickleLoader.folder, self.save_dir, file_name)
+        return pd.read_pickle(path)
+
+    @staticmethod
+    def list_dir() -> List[str]:
+        """Returns existing save directories"""
+        dirs = [os.path.basename(p[0]) for p in os.walk(PickleLoader.folder)][1:]
+        return dirs
+
+    @staticmethod
+    def get_latest_dir() -> List[str]:
+        """Returns the latest save directory"""
+        return PickleLoader.list_dir()[-1]
+
 class DataSaver(PassThroughMixin):
     """Base class for data saver with interface for Pipeline usage"""
 
@@ -56,4 +89,4 @@ class DataPickler(DataSaver):
         if not os.path.exists(self.save_dir):
             os.mkdir(self.save_dir)
         with open(self.save_path, 'wb') as f:
-            pickle.dump(save_obj, f)
+            pickle.dump(save_obj, f, protocol=4)
