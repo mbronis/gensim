@@ -5,7 +5,6 @@ There are pipelines for raw data preprocessing and for training models.
 
 from sklearn.pipeline import Pipeline
 
-from src.io import CsvDataLoader
 from src.preproc import RawDataCleaner, TextCleaner, SimpleTokenizer
 
 
