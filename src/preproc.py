@@ -107,5 +107,6 @@ class BaseTokenizer(PassThroughMixin):
 class SimpleTokenizer(BaseTokenizer):
     """Splits words by space"""
 
+    @staticmethod
     def tokenize(doc: str) -> List[str]:
         return [tok for tok in doc.split()]
