@@ -14,3 +14,10 @@ class BadPickleLoaderDataType(Exception):
     def __init__(self, arg_value):
         message = f"Bad 'data_type' argument value: {arg_value}. Should be one of: 'data', 'meta'."
         super().__init__(message)
+
+
+class TfIdfNotFitted(Exception):
+    """Exception raised when trying to transform with not fitted model"""
+
+    def __init__(self, message="This model has not been fitted yet. Call `fit` first."):
+        super().__init__(message)
