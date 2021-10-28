@@ -82,7 +82,7 @@ class TfIdfTransformer(BaseEstimator, TransformerMixin):
         columns = [self.vocab[i] for i in range(len(self.vocab))]
         df_sparse = pd.DataFrame.sparse.from_spmatrix(tfidf_matrix, columns=columns)
 
-        logger.log(f"creating dense df, mem used: {mem_used()}")
-        df_dense = df_sparse.sparse.to_dense()
+        # logger.log(f"creating dense df, mem used: {mem_used()}")
+        # df_dense = df_sparse.sparse.to_dense()
 
-        return df_dense
+        return df_sparse
