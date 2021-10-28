@@ -11,7 +11,7 @@ from gensim.models import TfidfModel
 
 from src.nlp.datatypes import Tokens
 from src.exceptions import TfIdfNotFitted
-from src.utils import Logger
+from src.utils import Logger, mem_used
 
 
 logger = Logger('tfidf')
@@ -36,7 +36,7 @@ class TfIdfTransformer(BaseEstimator, TransformerMixin):
     def fit(self, docs: Iterable[Tokens], y: Iterable = None):
 
         # train dictionary
-        logger.log("fitting vocabulary")
+        logger.log(f"fitting vocabulary, mem used: {mem_used()}")
         self.vocab = Dictionary(documents=docs)
 
         # filter vocab entries
@@ -51,7 +51,7 @@ class TfIdfTransformer(BaseEstimator, TransformerMixin):
         logger.log(f"vocabulary fitted. unique tokens count: {len(self.vocab)}")
 
         # train tfifd model
-        logger.log("fitting tfidf model")
+        logger.log(f"fitting tfidf model, mem used: {mem_used()}")
         model_params = {
             'normalize': self.normalize,
             'smartirs': self.smartirs,
@@ -59,7 +59,7 @@ class TfIdfTransformer(BaseEstimator, TransformerMixin):
         }
         model_params = {k: v for k, v in model_params.items() if v is not None}
         self.model = TfidfModel(dictionary=self.vocab, **model_params)
-        logger.log("tfidf model fitted")
+        logger.log(f"tfidf model fitted, mem used: {mem_used()}")
 
         return self
 
@@ -67,22 +67,22 @@ class TfIdfTransformer(BaseEstimator, TransformerMixin):
         if not (self.vocab and self.model):
             raise TfIdfNotFitted()
 
-        logger.log("creating corpus")
+        logger.log(f"creating corpus, mem used: {mem_used()}")
         corpus = [self.vocab.doc2bow(doc) for doc in docs]
-        logger.log(f"corpus created. number of docs: {len(corpus)}")
-        logger.log("vectorizing corpus with tfidf model")
+
+        logger.log(f"vectorizing corpus with tfidf model, mem used: {mem_used()}")
         tfidf_vectors = [self.model[bow] for bow in corpus]
 
         # sparse matrix reprezentation
-        logger.log("creating sparse corpus representation")
+        logger.log(f"creating sparse corpus representation, mem used: {mem_used()}")
         i, j, data = zip(*((i, t[0], t[1]) for i, row in enumerate(tfidf_vectors) for t in row))
         tfidf_matrix = scipy.sparse.coo_matrix((data, (i, j)), shape=(len(corpus), len(self.vocab)))
 
-        logger.log("creating sparse df")
+        logger.log(f"creating sparse df, mem used: {mem_used()}")
         columns = [self.vocab[i] for i in range(len(self.vocab))]
         df_sparse = pd.DataFrame.sparse.from_spmatrix(tfidf_matrix, columns=columns)
 
-        logger.log("creating dense df")
+        logger.log(f"creating dense df, mem used: {mem_used()}")
         df_dense = df_sparse.sparse.to_dense()
 
         return df_dense
