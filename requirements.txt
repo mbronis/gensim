@@ -6,3 +6,4 @@ catboost==1.0.0
 notebook
 jupyter_contrib_nbextensions
 gitpython
+toml

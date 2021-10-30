@@ -6,13 +6,15 @@ import pickle
 from abc import abstractmethod
 from typing import List
 
+import toml
 import pandas as pd
 
 from src.transformers import PassThroughMixin
-from src.exceptions import BadPickleLoaderDataType
+from src.exceptions import BadPickleLoaderDataType, BadDatasetName
 from src.utils import Logger
 
 
+config = toml.load('config/settings.toml')
 logger = Logger('io')
 
 
@@ -33,17 +35,33 @@ class DataLoader(PassThroughMixin):
 class CsvDataLoader(DataLoader):
     """Loading data from local csv"""
 
-    def __init__(self, file_name: str = 'polish_sentiment_dataset.csv'):
-        self.folder = './data/'
+    def __init__(self,
+                 folder: str = './data/',
+                 file_name: str = 'polish_sentiment_dataset.csv',
+                 encoding: str = None,
+                 names: List[str] = None):
+        self.folder = folder
         self.file_name = file_name
+        self.encoding = encoding
+        self.names = names
 
     def load(self) -> pd.DataFrame:
         path = os.path.join(self.folder, self.file_name)
 
         logger.log(f'loading from csv: {path}')
-        data = pd.read_csv(path)
+        data = pd.read_csv(path, encoding=self.encoding, names=self.names)
         logger.log(f'loaded {len(data)} rows')
+
         return data
+
+def csv_loader_factory(dataset_name: str) -> CsvDataLoader:
+    if dataset_name not in config['datasets']:
+        raise BadDatasetName(dataset_name, list(config['datasets'].keys()))
+
+    folder = config['data']['FOLDER']
+    csv_loader = CsvDataLoader(folder=folder, **config['datasets'][dataset_name])
+
+    return csv_loader
 
 
 class PickleLoader(DataLoader):

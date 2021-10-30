@@ -1,6 +1,9 @@
 """Module with custom exceptions"""
 
 
+from typing import List
+
+
 class GitIsDirtyException(Exception):
     """Exception raised when there are uncommited changes in current repo"""
 
@@ -20,4 +23,12 @@ class TfIdfNotFitted(Exception):
     """Exception raised when trying to transform with not fitted model"""
 
     def __init__(self, message="This model has not been fitted yet. Call `fit` first."):
+        super().__init__(message)
+
+
+class BadDatasetName(Exception):
+    """Exception raised when trying to create CsvLoader for not defined dataset"""
+
+    def __init__(self, dataset_name: str, avaliable_names: List[str]):
+        message = f"No configuration found for: '{dataset_name}'. Avaliable datasets: {avaliable_names}"
         super().__init__(message)
