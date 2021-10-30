@@ -68,7 +68,7 @@ class PickleLoader(DataLoader):
     """Loading preprocessed data from pickle"""
     file_name = {
         'data': 'df_prepro.pkl',
-        'meta': 'df_prepro_meta.pkl'
+        'meta': 'df_prepro_metadata.pkl'
     }
     folder = './data/'
 
