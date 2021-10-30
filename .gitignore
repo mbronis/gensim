@@ -2,6 +2,7 @@ venv*
 data/*/
 data/*.csv
 data/*.pkl
+catboost_info
 python_path.txt
 test.py
 .ipynb_checkpoints
