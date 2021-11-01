@@ -41,7 +41,15 @@ However this feature can leak data. Its impact on model performance will be test
 *particular users, when refered in tweet have specific sentiment?*
 * average of targets for tweets made by users mentioned  
 *you use similar sentiment as users you mention?*
+* remove/replace with dedicated token
+* count
 
+**links/emails/hashtags in text**
+* remove/replace with dedicated token
+* count
+* hashtags:
+    * create dedicated embeddings
+    * remove #sign and threat as any other word
 
 
 
