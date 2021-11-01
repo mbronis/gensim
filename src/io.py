@@ -70,7 +70,7 @@ class PickleLoader(DataLoader):
         'data': 'df_prepro.pkl',
         'meta': 'df_prepro_metadata.pkl'
     }
-    folder = './data/'
+    folder = config['data']['FOLDER']
 
     def __init__(self, save_dir: str = None, data_type: str = 'data'):
         self.save_dir = save_dir or PickleLoader.get_latest_dir()
@@ -102,7 +102,8 @@ class DataSaver(PassThroughMixin):
     """Base class for data saver with interface for Pipeline usage"""
 
     def __init__(self, save_dir: str, file_name: str) -> None:
-        self.save_dir = os.path.join('./data', save_dir)
+        folder = config['data']['FOLDER']
+        self.save_dir = os.path.join(folder, save_dir)
         self.save_path = os.path.join(self.save_dir, file_name)
 
     @abstractmethod
