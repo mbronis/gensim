@@ -129,11 +129,11 @@ class UserReferenceProcessor(PassThroughMixin, ExtractorMixin):
 
     def transform(self, docs: Sequence[str]) -> pd.DataFrame:
         extracted = self._extract(docs, UserReferenceProcessor.pattern)
-        # extracted = [user[1:] for users in extracted for user in users]
+        extracted = extracted.apply(lambda x: [user[1:] for user in x])
 
         df = pd.DataFrame(index=docs.index)
-        df['user_mentions'] = extracted
-        # df['user_mentions_count'] = []
+        df['users_mentioned'] = extracted
+        df['users_mentioned_count'] = extracted.apply(len)
 
         return df
 
