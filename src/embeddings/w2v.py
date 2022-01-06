@@ -147,5 +147,6 @@ class W2VEmbedder(BaseEstimator, TransformerMixin):
         
         df = pd.DataFrame(map(self._transform_sequence, sentences))
         df.columns = self.get_feature_names_out()
+        df.index = sentences.index
 
         return df
