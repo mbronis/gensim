@@ -97,6 +97,7 @@ class W2VEmbedder(BaseEstimator, TransformerMixin):
 
         self.model: Word2Vec = None
         self.model_name = model_name
+        self.default_vector = np.zeros(vector_size)
 
     def fit(self, sentences: Iterable[List[str]]):
         """Trains w2v model on pd.Series of tokenized sequences"""
@@ -119,16 +120,12 @@ class W2VEmbedder(BaseEstimator, TransformerMixin):
 
         return self
     
-    def _transform_sequence(self, sequence: List[str]) -> np.ndarray:
+    def _transform_sequence(self, tokens: List[str]) -> np.ndarray:
         """Embedds single sentence to w2v representation"""
-        if self.model is None:
-            raise AttributeError("Model hasn't been fitted yet. Run `fit` earlier.")
-
-        default_vector = np.zeros(self.model.vector_size)
         vectorized = [
-            self.model.wv[tok] if self.model.wv.has_index_for(tok) else default_vector 
-            for tok in sequence]
-
+            self.model.wv[tok] if self.model.wv.has_index_for(tok) else self.default_vector 
+            for tok in tokens]
+        
         return sum(vectorized)
 
     def get_feature_names_out(self) -> List[str]:
@@ -145,8 +142,10 @@ class W2VEmbedder(BaseEstimator, TransformerMixin):
             sentences: pd.Series[List[str]]
                 Series with tokenized sentences to be transformed
         """
+        if self.model is None:
+            raise AttributeError("Model hasn't been fitted yet. Run `fit` earlier.")
         
-        df = sentences.apply(lambda seq: pd.Series(self._transform_sequence(seq)))
+        df = pd.DataFrame(map(self._transform_sequence, sentences))
         df.columns = self.get_feature_names_out()
 
         return df
