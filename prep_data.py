@@ -1,3 +1,8 @@
+"""
+Script for raw data preprocessing
+"""
+
+
 from datetime import datetime
 
 from src.git_parser import GitParser
