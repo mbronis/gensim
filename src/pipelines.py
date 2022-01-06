@@ -1,7 +1,7 @@
 from tempfile import mkdtemp
 from sklearn.pipeline import Pipeline
 
-from src.io import CsvDataLoader, DataPickler
+from src.io import CsvDataLoader
 from src.preproc import RawDataCleaner, TextCleaner, SimpleTokenizer
 
 data_preproc_pipe = Pipeline([
