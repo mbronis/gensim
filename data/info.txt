@@ -3,8 +3,8 @@ https://drive.google.com/file/d/1vXqUEBjUHGGy3vV2dA7LlvBjjZlQnl0D/view?usp=shari
 https://ermlab.com/en/blog/nlp/polish-sentiment-analysis-using-keras-and-word2vec/
 
 poeval19
-training_set_clean_only_tags.txt
 http://2019.poleval.pl/index.php/tasks/task6
+preprocessed with ./data/make_poleval19.py
 
 sentiment140
 https://www.kaggle.com/kazanova/sentiment140

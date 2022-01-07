@@ -8,3 +8,8 @@ FOLDER = './data/'
         names = ["target", "ids", "date", "flag", "user", "text"]
     [datasets.sentiment_pl]
         file_name = 'polish_sentiment_dataset.csv'
+    [datasets.poleval]
+        file_name = 'poleval19.csv'
+        encoding = 'UTF-8'
+    
+    
