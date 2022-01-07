@@ -2,6 +2,7 @@ venv*
 models*
 data/*/
 data/*.csv
+data/*.txt
 data/*.pkl
 python_path.txt
 test.py
