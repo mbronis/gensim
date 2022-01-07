@@ -5,3 +5,6 @@ https://ermlab.com/en/blog/nlp/polish-sentiment-analysis-using-keras-and-word2ve
 poeval19
 training_set_clean_only_tags.txt
 http://2019.poleval.pl/index.php/tasks/task6
+
+sentiment140
+https://www.kaggle.com/kazanova/sentiment140

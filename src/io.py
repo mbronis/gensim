@@ -1,12 +1,21 @@
+"""Module with classes for loading and saving data/metadata/models"""
+
+
 import os
 import pickle
 from abc import abstractmethod
 from typing import List
 
+import toml
 import pandas as pd
 
 from src.transformers import PassThroughMixin
-from src.exceptions import BadPickleLoaderDataType
+from src.exceptions import BadPickleLoaderDataType, BadDatasetName
+from src.utils import Logger
+
+
+config = toml.load('config/settings.toml')
+logger = Logger('io')
 
 
 class DataLoader(PassThroughMixin):
@@ -26,21 +35,42 @@ class DataLoader(PassThroughMixin):
 class CsvDataLoader(DataLoader):
     """Loading data from local csv"""
 
-    def __init__(self, file_name: str = 'polish_sentiment_dataset.csv'):
-        self.folder = './data/'
+    def __init__(self,
+                 folder: str = './data/',
+                 file_name: str = 'polish_sentiment_dataset.csv',
+                 encoding: str = None,
+                 names: List[str] = None):
+        self.folder = folder
         self.file_name = file_name
+        self.encoding = encoding
+        self.names = names
 
     def load(self) -> pd.DataFrame:
-        return pd.read_csv(self.folder + self.file_name)
+        path = os.path.join(self.folder, self.file_name)
+
+        logger.log(f'loading from csv: {path}')
+        data = pd.read_csv(path, encoding=self.encoding, names=self.names)
+        logger.log(f'loaded {len(data)} rows')
+
+        return data
+
+def csv_loader_factory(dataset_name: str) -> CsvDataLoader:
+    if dataset_name not in config['datasets']:
+        raise BadDatasetName(dataset_name, list(config['datasets'].keys()))
+
+    folder = config['data']['FOLDER']
+    csv_loader = CsvDataLoader(folder=folder, **config['datasets'][dataset_name])
+
+    return csv_loader
 
 
 class PickleLoader(DataLoader):
     """Loading preprocessed data from pickle"""
     file_name = {
         'data': 'df_prepro.pkl',
-        'meta': 'df_prepro_meta.pkl'
+        'meta': 'df_prepro_metadata.pkl'
     }
-    folder = './data/'
+    folder = config['data']['FOLDER']
 
     def __init__(self, save_dir: str = None, data_type: str = 'data'):
         self.save_dir = save_dir or PickleLoader.get_latest_dir()
@@ -51,7 +81,11 @@ class PickleLoader(DataLoader):
     def load(self) -> pd.DataFrame:
         file_name = PickleLoader.file_name[self.data_type]
         path = os.path.join(PickleLoader.folder, self.save_dir, file_name)
-        return pd.read_pickle(path)
+
+        logger.log(f'loading from pickle: {path}')
+        data = pd.read_pickle(path)
+        logger.log(f'loaded {len(data)} rows')
+        return data
 
     @staticmethod
     def list_dir() -> List[str]:
@@ -62,13 +96,14 @@ class PickleLoader(DataLoader):
     @staticmethod
     def get_latest_dir() -> List[str]:
         """Returns the latest save directory"""
-        return PickleLoader.list_dir()[-1]
+        return sorted(PickleLoader.list_dir())[-1]
 
 class DataSaver(PassThroughMixin):
     """Base class for data saver with interface for Pipeline usage"""
 
     def __init__(self, save_dir: str, file_name: str) -> None:
-        self.save_dir = os.path.join('./data', save_dir)
+        folder = config['data']['FOLDER']
+        self.save_dir = os.path.join(folder, save_dir)
         self.save_path = os.path.join(self.save_dir, file_name)
 
     @abstractmethod

@@ -1,3 +1,6 @@
+"""Module with various utility functions and classes"""
+
+import os
 import logging
 from typing import Dict
 
@@ -43,3 +46,11 @@ def prep_df_metadata(X: pd.DataFrame, pipe: Pipeline, git_parser: GitParser, ts:
     metadata_df = pd.Series(metadata_data, index=metadata_columns).to_frame().T
 
     return metadata_df
+
+def mem_used() -> float:
+    """Returns % of memory used."""
+
+    total_memory, used_memory, free_memory = map(
+        int, os.popen('free -t -m').readlines()[-1].split()[1:])
+
+    return round(100 * used_memory / total_memory, 1)

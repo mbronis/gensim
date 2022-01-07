@@ -1,0 +1,10 @@
+[data]
+FOLDER = './data/'
+
+[datasets]
+    [datasets.tweets]
+        file_name = 'training.1600000.processed.noemoticon.csv'
+        encoding = 'ISO-8859-1'
+        names = ["target", "ids", "date", "flag", "user", "text"]
+    [datasets.sentiment_pl]
+        file_name = 'polish_sentiment_dataset.csv'

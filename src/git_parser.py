@@ -1,3 +1,6 @@
+"""Module with `GitParser` class for accessing git info"""
+
+
 from git import Repo
 from collections import namedtuple
 
