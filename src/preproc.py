@@ -3,7 +3,7 @@
 
 from abc import abstractmethod
 import re
-from typing import List, Sequence
+from typing import List, Sequence, Tuple
 
 import pandas as pd
 
@@ -210,3 +210,14 @@ class HashtagsExtractor(Extractor):
 class LinksExtractor(Extractor):
     """Returns list of links extracted from tweet texts"""
     pattern = r'http[s]*://[^ ]+'
+
+
+def tokenize(texts_clean: pd.Series, labels: pd.Series) -> Tuple[pd.Series, pd.Series]:
+    
+    tokens = pd.Series(map(lambda text: text.split(), texts_clean))
+    tokens.index = texts_clean.index
+
+    tokens = tokens[(pd.Series(map(len, tokens))>0).values]
+    labels_tok = labels[tokens.index]
+    
+    return tokens, labels_tok
