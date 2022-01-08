@@ -1,5 +1,6 @@
 venv*
 models*
+opt_studies*
 data/*/
 data/*.csv
 data/*.txt
