@@ -8,3 +8,6 @@ jupyter_contrib_nbextensions
 gitpython
 toml
 optuna==2.10.0
+spacy==3.2.1
+nltk==3.6.7
+lime==0.2.0.1
