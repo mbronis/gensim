@@ -3,6 +3,7 @@ from typing import Tuple
 import pandas as pd
 import numpy as np
 
+import matplotlib.pyplot as plt
 from sklearn.metrics import auc, roc_auc_score, accuracy_score, f1_score, precision_score, recall_score
 
 METRICS = {
@@ -43,5 +44,37 @@ def compute_metrics(train_data: Tuple, test_data: Tuple, metrics = METRICS):
     for m in metrics:
         res_m = compute_metric((act_train, proba_train, pred_train), (act_test, proba_test, pred_test), m)
         res = pd.concat([res, res_m])
-    
-    return res
+
+    mean = pd.DataFrame(zip([round(np.mean(proba_train), 6)], [round(np.mean(proba_test), 6)]),
+             columns=['train', 'test'], index=['Mean'])
+
+    return pd.concat([res, mean])
+
+def plot_preds(act, pred):
+    assert len(act) == len(pred), f'Len of `act` and `pred` must match {len(act)} != {len(pred)}'
+
+    ax = pd.Series(pred).plot.hist()
+    ax.set_title('Preds hist')
+    plt.show()
+
+    df = pd.DataFrame({'act': act, 'pred': pred})
+    df['pred_q'] = pd.qcut(df['pred'], q=[x/10 for x in range(11)], labels=False, duplicates='drop')
+
+
+    dfg = df.groupby('pred_q').agg(
+        count=('act', 'size'),
+        act=('act', 'mean'),
+        pred=('pred', 'mean')
+    )
+
+    ax1 = dfg[['count']].plot(kind='bar')
+    ax2 = ax1.twinx()
+    dfg[['act', 'pred']].plot(kind='line', ax=ax2, color=['tab:red', 'tab:green'])
+
+    ax1.set_title('Act vs predicted')
+    ax1.set_ylabel('Count')
+    ax2.set_ylabel('Freq')
+
+    plt.show()
+
+    return dfg
