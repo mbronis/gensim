@@ -51,6 +51,9 @@ However this feature can leak data. Its impact on model performance will be test
     * create dedicated embeddings
     * remove #sign and threat as any other word
 
-
-
+# Setup
+```python
+pip install -r requirements.txt
+python -m spacy download pl_core_news_md
+```
 
