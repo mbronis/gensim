@@ -2,7 +2,7 @@
 Script for praparing raw poleval19.csv file
 
 It concatenates raw files:
-- training_set_clean_only_tags.txt
+- test_set_clean_only_tags.txt
 - training_set_clean_only_text.txt
 - test_set_clean_only_tags.txt
 - test_set_clean_only_text.txt
@@ -22,8 +22,11 @@ if __name__ == '__main__':
         train_text = pd.Series([t[:-1] for t in train_text])
 
     path = os.path.join(folder, 'training_set_clean_only_tags.txt')
-    train_tags = pd.read_csv(path, encoding='UTF-8')
-    train_tags = train_tags['0']
+    with open(path, 'r', encoding="utf8") as f:
+        train_tags = f.readlines()
+        train_tags = pd.Series([t[:-1] for t in train_tags])
+
+    assert len(train_text) == len(train_tags), 'Len of text and tags does not match'
 
     train_data = pd.DataFrame(zip(train_text, train_tags), columns=['text_raw', 'tag'])
     train_data['dataset'] = 'train'
@@ -34,8 +37,11 @@ if __name__ == '__main__':
         test_text = pd.Series([t[:-1] for t in test_text])
 
     path = os.path.join(folder, 'test_set_clean_only_tags.txt')
-    test_tags = pd.read_csv(path, encoding='UTF-8')
-    test_tags = test_tags['0']
+    with open(path, 'r', encoding="utf8") as f:
+        test_tags = f.readlines()
+        test_tags = pd.Series([t[:-1] for t in test_tags])
+
+    assert len(test_text) == len(test_tags), 'Len of text and tags does not match'
 
     test_data = pd.DataFrame(zip(test_text, test_tags), columns=['text_raw', 'tag'])
     test_data['dataset'] = 'test'
