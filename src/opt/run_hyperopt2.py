@@ -100,8 +100,12 @@ def objective(trial):
         'learning_rate': trial.suggest_discrete_uniform("learning_rate", 0.001, 0.101, 0.005),
         'reg_lambda': trial.suggest_int('reg_lambda', 1, 9, 2),
         'max_depth': trial.suggest_int('max_depth', 2, 16, 1),
-        'num_leaves': trial.suggest_int('num_leaves', 6, 36, 6),
     }
+    if cb_params == 'Lossguide':
+        cb_params_lg = {
+            'num_leaves': trial.suggest_int('num_leaves', 6, 36, 6)
+        }
+        cb_params.update(cb_params_lg)
 
     cb = CatBoostClassifier(**cb_params)
     cb.fit(X=train_vec, y=train_label, eval_set=(test_vec, test_label))
