@@ -143,11 +143,15 @@ class TextCleaner(BaseEstimator, TransformerMixin):
         """Applies all initialized cleaning functions"""
 
         sentences_clean = sentences.copy()
+        if not isinstance(sentences_clean, pd.Series):
+            sentences_clean = pd.Series(sentences_clean)
 
         for fn in self.functions:
             sentences_clean = map(fn, sentences_clean)
-        
+    
         sentences_clean = pd.Series(sentences_clean)
-        sentences_clean.index = sentences.index
+
+        if len(sentences_clean) == len(sentences):
+            sentences_clean.index = sentences_clean.index
 
         return sentences_clean
