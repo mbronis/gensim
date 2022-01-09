@@ -4,14 +4,97 @@
 **Task**: binary classification  
 **Features**: pl tweet texts
 
-
 |dataset|size|freq|
 |-------|----|----|		
 test	|999	|0.134134|
 train	|10040	|0.084761|
 
+## w2v classifier pipeline
+Data was prepocessed (cleaning), embrdded with w2v model and finally catboost classifier was used.
 
-## Results
+
+Params of each step were optimized with `optuna`.  
+
+**Params**:  
+Cleaner: `'clean_email',
+ 'clean_emoji',
+ 'clean_hashtag',
+ 'clean_non_alpha',
+ 'clean_non_letter',
+ 'clean_url',
+ 'clean_user_ref',
+ 'drop_repeated',
+ 'latinize',
+ 'to_lower'`
+
+w2v embrdder: `'alpha',
+ 'cbow_mean',
+ 'epochs',
+ 'hs',
+ 'max_final_vocab',
+ 'min_alpha',
+ 'min_count',
+ 'model_name',
+ 'negative',
+ 'ns_exponent',
+ 'sample',
+ 'sg',
+ 'vector_size',
+ 'window',
+ 'workers'`
+
+Classifier: `'grow_policy',
+ 'min_data_in_leaf',
+ 'learning_rate',
+ 'reg_lambda',
+ 'max_depth',
+ 'num_leaves'`
+
+## optimization results
+
+1.5k trial were run optimizing two objectives: `auc` and `f1`:
+![](./res/trails_results.png)
+best results are colored red.  
+
+**Hyperparams importances:**  
+AUC
+![](./res/auc_importance.png) 
+F1
+![](./res/af1_importance.png)
+
+**Insights**:  
+
+Text cleaner
+* `params_latinize` minor impact -> can be defaulted to **False**
+* `params_to_lower` lowers both **auc** and **f1** -> default to **False**
+
+W2V Encoder
+* positive corr of `epochs` with **f1** -> increase max number of `epoch` ~20
+* !**auc** and **f1** has almost perfect negative corellation with respect to number of `epoch`
+* increase `params_alpha` significant increasing trend of **f1** -> max should be increased to 0.2
+* `params_max_final_vocab` should be between 10-15k
+* `params_min_count`:  
+    * **auc** is maximized in 100-125 range
+    * **f1** max around 50-60, negative corr
+* `params_ns_exponent` best metric values between -0.2 and 0.2, above 0.2 both metrics decrease
+* `params_sg` minor impact on average metrics -> fix at 0
+* `params_vector_size`  
+Best **auc** values match lowest **f1** values. Similarly in the oher side
+    * **auc** best values between 400 and 750
+    * **f1** best values between 300 and 600
+
+Learner
+* `params_learning_rate` slight increasing trend of **f1** -> max should be increased to 0.2
+* ?`params_grow_policy` other than *Lossguide* failed
+* `params_max_depth`: negative corr with **auc** and positive with **f1**
+Best **auc** at 3, best **f1** at 13
+* `params_min_data_in_leaf` both metrics has positive corr -> should be increased to ~200
+* `params_num_leaves` significant impact, similar to max_depth
+Best **auc** at 5, best **f1** at 35
+* `params_reg_lambda` minor impact, should be between 3 and 7, can be fixed to 5/6
+Best **auc** at 3, best **f1** at 7
+
+## Best model results
 ----
 ### catboost on raw text
 | metric    | train      | test   |
